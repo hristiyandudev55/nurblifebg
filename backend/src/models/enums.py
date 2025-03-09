@@ -1,0 +1,28 @@
+from enum import Enum
+
+
+class Extras(str, Enum):
+    GUIDANCE_LAP="guidance_lap"
+    VIDEO_RECORD="video_record"
+    DMG_EXCESS_REDUCTION="dmg_excess_reduction"
+    EXTRA_DRIVER=(
+        "extra_driver"  # up to 2 drivers is free, the 3rd is paying 50 euro additional
+    )
+
+
+class BookingStatus(str, Enum):
+    CONFIRMED="confirmed"
+    CANCELLED="cancelled"
+    PENDING="pending"
+
+
+class Package(str, Enum):
+    BASE_PACKAGE="base_package"
+    PREMIUM_PACKAGE="premium_package"
+
+
+class Trace(str, Enum):
+    PUBLIC_SESSION="public_session"
+    TRACKDAY="trackday"
+    GP_TRACK="gp_track"
+    SPA_FRANCOCHAMPS="spa_francochamps"
