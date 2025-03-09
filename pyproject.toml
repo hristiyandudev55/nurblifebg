@@ -1,0 +1,45 @@
+[project]
+name = "backend"
+version = "0.1.0"
+description = "NurbLifeBG"
+authors = [
+    {name = "Hristiyan", email = "hristiyandudev@gmail.com"}
+]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115.5,<0.116.0",
+    "uvicorn>=0.32.1,<0.33.0",
+    "sqlalchemy>=2.0.36,<2.1.0",
+    "pydantic>=2.10.0,<2.11.0",
+    "pydantic-settings>=2.6.1,<2.7.0",
+    "psycopg2-binary>=2.9.10,<2.10.0",
+    "python-dotenv>=1.0.1,<1.1.0",
+    "apscheduler>=3.10.1,<3.11.0",
+    "boto3 (>=1.36.26,<2.0.0)",
+    "pillow (>=11.1.0,<12.0.0)"
+]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "backend"
+version = "0.1.0"
+description = "NurbLifeBG"
+authors = ["Hristiyan <hristiyandudev@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+# packages = [{ include = "src", from = "." }]
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.10.0"
+ruff = "^0.7.4"
+pytest = "^8.0.0"
+httpx = "^0.28.1"
+
+[tool.ruff]
+extend-select = ["F841"]
+ignore = ["F841"] 
