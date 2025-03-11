@@ -26,3 +26,10 @@ class Trace(str, Enum):
     TRACKDAY="trackday"
     GP_TRACK="gp_track"
     SPA_FRANCOCHAMPS="spa_francochamps"
+
+
+class CarGearboxEnum(str, Enum):
+    MANUAL="manual"
+    AUTOMATIC="automatic"
+    SEMI_AUTOMATIC = "Semi-Automatic"
+    CVT = "CVT"
