@@ -1,6 +1,4 @@
-from fastapi import FastAPI
-from sqlalchemy import UUID, Column, Integer, String, Enum, ForeignKey, Float, null
-from sqlalchemy.orm import relationship
+from sqlalchemy import Boolean, Column, Integer, String, Enum, Float
 from models.base import Base, BaseMixin
 from models.enums import CarGearboxEnum, DriveTypeEnum, RollcageTypeEnum, SeatsCountEnum
 
@@ -30,6 +28,7 @@ class Car(Base, BaseMixin):
         rollcage_type (str): Type of rollcage (e.g., Full Rollcage, semi, no).
         price_for_lap (int): Price for a lap in euros.
         seats_count (int): Number of seats in the car.
+        in_repair_shop: Shows if the car is unavailable at the moment.
     """
 
     image = Column(String, nullable=False, unique=True)
@@ -51,3 +50,4 @@ class Car(Base, BaseMixin):
     rollcage_type = Column(Enum(RollcageTypeEnum), nullable=False)
     price_for_lap = Column(Integer, nullable=False)
     seats_count = Column(Enum(SeatsCountEnum), nullable=False)
+    in_repair_shop = Column(Boolean, nullable=False, default=False)

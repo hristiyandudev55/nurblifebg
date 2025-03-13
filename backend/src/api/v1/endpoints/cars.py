@@ -17,7 +17,7 @@ router = APIRouter()
 
 
 @router.post("/", response_model=CarResponse, status_code=200)
-def _create_car(car: CarCreate, db: Session = Depends(get_db)):
+def create_car(car: CarCreate, db: Session = Depends(get_db)):
     """
     Create a new car with the provided information.
 
@@ -40,7 +40,7 @@ def _get_car_by_id(car_id: UUID, db: Session = Depends(get_db)):
 
 
 @router.get("/", response_model=List[CarResponse], status_code=200)
-def _get_all_cars(db: Session = Depends(get_db)):
+def get_all_cars(db: Session = Depends(get_db)):
     """
     Retrieve all cars stored in the database.
 
