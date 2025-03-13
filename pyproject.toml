@@ -32,7 +32,7 @@ description = "NurbLifeBG"
 authors = ["Hristiyan <hristiyandudev@gmail.com>"]
 license = "MIT"
 readme = "README.md"
-# packages = [{ include = "src", from = "." }]
+# packages = [{ include = "backend/src"}]
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.10.0"
