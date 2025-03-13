@@ -2,11 +2,18 @@ from typing import Optional
 from uuid import UUID
 
 from models.enums import CarGearboxEnum, DriveTypeEnum, RollcageTypeEnum, SeatsCountEnum
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator, model_validator
+
+
+def validate_horsepower(cls, v, values):
+    if v <= 0:
+        raise ValueError("Horsepower must be positive")
+    return v
 
 
 class BaseConfig(BaseModel):
     model_config = {"from_attributes": True}
+
 
 class CarCreate(BaseConfig):
     image: str
@@ -29,8 +36,25 @@ class CarCreate(BaseConfig):
     price_for_lap: int
     seats_count: SeatsCountEnum
 
+    @field_validator("hp", "nm", "price_for_lap", "weight", "acceleration", mode="before")
+    @classmethod
+    def validate_positive_values(cls, v, field):
+        if v <= 0:
+            raise ValueError(f"{field.name} must be positive number.")
+        return v
+
+    @model_validator(mode="after")
+    def validate_hp_vs_nm(self):
+        if self.nm < self.hp:
+            raise ValueError(
+                f"Torque {self.nm} must be greater than or equal to horsepower {self.hp}."
+            )
+        return self
+
+
 class CarResponse(CarCreate):
     id: UUID
+
 
 class CarUpdate(CarCreate):
     image: Optional[str] = None
