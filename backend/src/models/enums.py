@@ -14,6 +14,7 @@ class BookingStatus(str, Enum):
     CONFIRMED = "confirmed"
     CANCELLED = "cancelled"
     PENDING = "pending"
+    REFUNDED = "refunded"
 
 
 class Package(str, Enum):
@@ -23,9 +24,6 @@ class Package(str, Enum):
 
 class Trace(str, Enum):
     PUBLIC_SESSION = "public_session"
-    TRACKDAY = "trackday"
-    GP_TRACK = "gp_track"
-    SPA_FRANCOCHAMPS = "spa_francochamps"
 
 
 class CarGearboxEnum(str, Enum):
@@ -52,3 +50,9 @@ class SeatsCountEnum(int, Enum):
     ONE_SEAT = 1
     TWO_SEATS = 2
     THREE_SEATS = 3
+
+
+class VoucherStatusEnum(str, Enum):
+    ACTIVE_VOUCHER="active_voucher"
+    USED_VOUCHER="used_voucher"
+    EXPIRED_VOUCHER="expired_voucher"

@@ -1,6 +1,8 @@
-from sqlalchemy import DateTime, Column, String, Integer, func
-from models.base import Base, BaseMixin
 from datetime import datetime, timedelta
+
+from models.base import Base, BaseMixin
+from models.enums import VoucherStatusEnum
+from sqlalchemy import Column, DateTime, Enum, Integer, String, func
 
 
 class Voucher(Base, BaseMixin):
@@ -13,6 +15,6 @@ class Voucher(Base, BaseMixin):
         DateTime, default=lambda: datetime.now() + timedelta(days=180)
     )
     status = Column(
-        String, default="active"
-    )  # TODO - Add Enum with statuses for vouchers >active/used/expired
+        Enum(VoucherStatusEnum), default="active_voucher"
+    )
     used_on = Column(DateTime, nullable=False)

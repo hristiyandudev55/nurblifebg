@@ -2,6 +2,5 @@ from sqlalchemy import Column, Integer
 from models.base import Base, BaseMixin
 
 
-class Payments(Base, BaseMixin):
-    booking_id =""
-    transaction_id =""
+class Transaction(Base, BaseMixin):
+    amount = Column(Integer, nullable=False)

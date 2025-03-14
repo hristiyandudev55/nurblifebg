@@ -39,7 +39,7 @@ def validate_voucher(code: str, db: Session) -> Voucher:
     if not voucher:
         raise ValueError("Invalid voucher code.")
 
-    if voucher.status == "used":
+    if voucher.status == "used": # type: ignore
         raise ValueError("This voucher has already been used.")
 
     # Ако в реалния модел полето е 'expiration_date', коригирайте и тук.
