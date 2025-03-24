@@ -25,5 +25,5 @@ class BaseMixin:
     __name__: str
 
     @declared_attr  # type: ignore
-    def __tablename__(cls) -> str:
+    def __tablename__(cls) -> str: # type: ignore
         return cls.__name__.lower()

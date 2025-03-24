@@ -6,6 +6,9 @@ load_dotenv()
 
 DB_URL = os.getenv("DATABASE_URL")
 DB_PASSWORD = quote_plus(os.getenv("DB_PASSWORD", ""))
+SERVICE_ACC_FILE = os.getenv("SERVICE_ACCOUNT_FILE")
+SCOPES_ = os.getenv("SCOPES")
+NURB_CALENDAR_ID = os.getenv("NURBURGRING_CALENDAR_ID")
 
 if not DB_URL:
     DB_URL = f"postgresql://{os.getenv('DB_USER')}:{DB_PASSWORD}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}?sslmode=require"

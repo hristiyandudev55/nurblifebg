@@ -1,4 +1,5 @@
 from sqlalchemy import Boolean, Column, Integer, String, Enum, Float
+from sqlalchemy.orm import relationship
 from models.base import Base, BaseMixin
 from models.enums import CarGearboxEnum, DriveTypeEnum, RollcageTypeEnum, SeatsCountEnum
 
@@ -30,6 +31,7 @@ class Car(Base, BaseMixin):
         seats_count (int): Number of seats in the car.
         in_repair_shop: Shows if the car is unavailable at the moment.
     """
+    __tablename__ = "cars" 
 
     image = Column(String, nullable=False, unique=True)
     make = Column(String, nullable=False)
@@ -51,3 +53,5 @@ class Car(Base, BaseMixin):
     price_for_lap = Column(Integer, nullable=False)
     seats_count = Column(Enum(SeatsCountEnum), nullable=False)
     in_repair_shop = Column(Boolean, nullable=False, default=False)
+
+    bookings = relationship("Booking", back_populates="car")

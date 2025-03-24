@@ -1,10 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from api.v1.routes import api_router
 import uvicorn
-
+from database.session import init_db
 
 app = FastAPI(
-    title="NURBLIFE-EXPERIENCE API",
+    title="NURBURGRING-EXPERIENCE API",
     description="Experience the legenedary Green Hell Track with our services.",
     version="1.0.0",
 )
@@ -17,6 +18,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.on_event("startup")
+async def startup_event():
+    init_db()
+    print("Database initialized")
+
+app.include_router(api_router, prefix="/api/v1")
 
 # Import functions from google_calendar.py
 try:

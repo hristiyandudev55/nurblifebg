@@ -45,10 +45,12 @@ class CarCreate(BaseConfig):
 
     @model_validator(mode="after")
     def validate_hp_vs_nm(self):
-        if self.nm < self.hp:
-            raise ValueError(
-                f"Torque {self.nm} must be greater than or equal to horsepower {self.hp}."
-            )
+        if isinstance(self, CarCreate):
+            if self.nm is not None and self.hp is not None:
+                if self.nm < self.hp:
+                    raise ValueError(
+                        f"Torque {self.nm} must be greater than or equal to horsepower {self.hp}."
+                    )
         return self
 
 

@@ -81,8 +81,9 @@ class CarRepository(BaseRepository):
             with transaction_context(self.db):
                 db_car = Car(**entity.model_dump())
                 self.db.add(db_car)
-                self.db.refresh(db_car)
 
+
+            self.db.refresh(db_car)
             return CarResponse.model_validate(db_car)
 
         except IntegrityError as e:
@@ -104,17 +105,16 @@ class CarRepository(BaseRepository):
 
         return CarResponse.model_validate(db_car)
 
-    def update(self, entity_id: UUID, entity: CarUpdate):
+    def update(self, entity_id: UUID, entity: CarUpdate) -> CarResponse:
         try:
             with transaction_context(self.db):
-                self.get_car_by_id.cache_clear()  # инвалидираме кеша, за да сме сигурни-
-                #че няма да получим стари данни.
+                self.get_car_by_id.cache_clear()
                 db_car = self.get_car_by_id(entity_id)
 
                 for key, value in entity.model_dump(exclude_unset=True).items():
                     setattr(db_car, key, value)
 
-            return CarUpdate.model_validate(db_car)
+            return CarResponse.model_validate(db_car)
 
         except SQLAlchemyError as e:
             logger.error("Database error updating car: %s", e)
@@ -132,7 +132,7 @@ class CarRepository(BaseRepository):
             return {"detail": f"Car with ID {entity_id} deleted successfully."}
 
         except SQLAlchemyError as e:
-            logger.error("Database error updating car: %s", e)
+            logger.error("Database error deleting car: %s", e)
             raise HTTPException(
                 status_code=HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Internal server error.",

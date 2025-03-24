@@ -245,3 +245,5 @@ fabric.properties
 ehthumbs.db
 Thumbs.db
 plantowork.md
+alembic.ini
+migrations/

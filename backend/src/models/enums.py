@@ -10,11 +10,14 @@ class Extras(str, Enum):
     )
 
 
-class BookingStatus(str, Enum):
+class BookingStatusEnum(str, Enum):
+    TEMPORARY_HOLD = "temporary_hold"
+    PENDING_PAYMENT = "pending_payment"
     CONFIRMED = "confirmed"
-    CANCELLED = "cancelled"
-    PENDING = "pending"
-    REFUNDED = "refunded"
+    PAYMENT_FAILED = "payment_failed"
+    EXPIRED = "expired"
+    CANCELED = "canceled"
+    COMPLETED = "completed"
 
 
 class Package(str, Enum):
@@ -23,7 +26,8 @@ class Package(str, Enum):
 
 
 class Trace(str, Enum):
-    PUBLIC_SESSION = "public_session"
+    PUBLIC_SESSION = "public_session" #min 2 laps
+    TRACKDAY = "trackday" #min 10 laps
 
 
 class CarGearboxEnum(str, Enum):

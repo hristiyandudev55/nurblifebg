@@ -1,7 +1,0 @@
-from sqlalchemy import Column, Integer
-from models.base import Base, BaseMixin
-
-
-class Payments(Base, BaseMixin):
-    booking_id =""
-    transaction_id =""

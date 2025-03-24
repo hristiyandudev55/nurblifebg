@@ -67,8 +67,8 @@ class HotelRepository(BaseRepository):
             with transaction_context(self.db):
                 db_hotel = Hotel(**hotel.model_dump())
                 self.db.add(db_hotel)
-                self.db.refresh(db_hotel)
-
+                
+            self.db.refresh(db_hotel)
             return HotelResponse.model_validate(db_hotel)
 
         except IntegrityError as e:
@@ -97,8 +97,8 @@ class HotelRepository(BaseRepository):
 
                 for key, value in hotel.model_dump(exclude_unset=True).items():
                     setattr(db_hotel, key, value)
-
-            return UpdateHotel.model_validate(db_hotel)
+            self.db.refresh(db_hotel)
+            return HotelResponse.model_validate(db_hotel)
 
         except SQLAlchemyError as e:
             logger.error("Database error updating hotel: %s", e)

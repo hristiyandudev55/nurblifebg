@@ -1,9 +1,28 @@
 from datetime import datetime, timezone
+import logging
 import secrets
 import string
+from fastapi import HTTPException
+from starlette.status import (
+    HTTP_404_NOT_FOUND,
+)
 from sqlalchemy.orm import Session
 
+from models.enums import VoucherStatusEnum
 from models.voucher import Voucher
+
+logger = logging.getLogger(__name__)
+
+def get_voucher_by_id(voucher_id: str, db: Session) -> Voucher:
+    db_voucher = db.query(Voucher).filter(Voucher.code == voucher_id).first()
+
+    if not db_voucher:
+        error_message = f"Voucher with ID {voucher_id} not found."
+        logger.error(error_message)
+        raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail=error_message)
+
+    return db_voucher
+
 
 def generate_code_voucher(length: int = 10) -> str:
     """
@@ -39,11 +58,10 @@ def validate_voucher(code: str, db: Session) -> Voucher:
     if not voucher:
         raise ValueError("Invalid voucher code.")
 
-    if voucher.status == "used": # type: ignore
+    if voucher.status == VoucherStatusEnum.USED_VOUCHER:
         raise ValueError("This voucher has already been used.")
 
-    # Ако в реалния модел полето е 'expiration_date', коригирайте и тук.
-    if voucher.expiration_date is not None and voucher.expiration_date < datetime.now(timezone.utc):
+    if voucher.expiration_date and voucher.expiration_date < datetime.now(timezone.utc):
         raise ValueError("This voucher has expired.")
 
     return voucher

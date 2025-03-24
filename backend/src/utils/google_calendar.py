@@ -1,4 +1,6 @@
 import datetime
+from logging import getLogger
+import logging
 import os
 
 import pytz
@@ -8,15 +10,21 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
+from core.config import SCOPES_, SERVICE_ACC_FILE, NURB_CALENDAR_ID
+from models.booking import Booking
+from models.car import Car
+
 # PATH to my Service Account JSON File
-SERVICE_ACCOUNT_FILE = "/Users/a516095/Documents/cred_ghub/nurblife-453719-c55365f7d993.json"
-SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"]
+SERVICE_ACCOUNT_FILE = SERVICE_ACC_FILE
+SCOPES = [SCOPES_]
 
 # ID of my Nurburgring calendar
-NURBURGRING_CALENDAR_ID = "4bfdce379c9274b68fee757227f67ed6d9b25101386ec1b405cdb7547e4cfbc5@group.calendar.google.com"
+NURBURGRING_CALENDAR_ID = NURB_CALENDAR_ID
+
+logger = logging.getLogger(__name__)
 
 # Check if the file exists
-if not os.path.exists(SERVICE_ACCOUNT_FILE):
+if not SERVICE_ACCOUNT_FILE or not os.path.exists(SERVICE_ACCOUNT_FILE):
     raise FileNotFoundError(
         f"Service Account file does not exist: {SERVICE_ACCOUNT_FILE}"
     )
@@ -32,7 +40,6 @@ except Exception as e:
     print(f"Error initializing Google API client: {e}")
     raise
 
-# Adding timezone for Bulgaria - Europe/Sofia
 bulgaria_tz = pytz.timezone("Europe/Sofia")
 
 
@@ -41,7 +48,6 @@ def format_datetime_to_local(iso_datetime_str):
     if not iso_datetime_str:
         return ""
 
-    # Parse ISO string to datetime object with timezone
     dt = parser.parse(iso_datetime_str)
 
     # Convert to Bulgaria/Sofia timezone
@@ -53,8 +59,7 @@ def format_datetime_to_local(iso_datetime_str):
 
 def get_events():
     try:
-        # Set time range for fetching events
-        now = datetime.datetime.utcnow().isoformat() + "Z"  # 'Z' means UTC time
+        now = datetime.datetime.utcnow().isoformat() + "Z"
         one_month_later = (
             datetime.datetime.utcnow() + datetime.timedelta(days=30)
         ).isoformat() + "Z"
@@ -69,7 +74,7 @@ def get_events():
                 maxResults=100,
                 singleEvents=True,
                 orderBy="startTime",
-                timeZone="Europe/Berlin",  # Set timezone for fetching
+                timeZone="Europe/Berlin",
             )
             .execute()
         )
@@ -79,19 +84,16 @@ def get_events():
         if not events:
             return {"message": "No upcoming events found."}
 
-        # Process events into a format suitable for frontend
         event_list = []
         for event in events:
-            # Extract times and convert to local timezone
             start_datetime = event["start"].get("dateTime")
             end_datetime = event["end"].get("dateTime")
 
-            # Check for all-day events
-            if not start_datetime:  # For all-day events
+            if not start_datetime:
                 start = event["start"].get("date")
                 end = event["end"].get("date")
                 is_all_day = True
-            else:  # For events with specific times
+            else:
                 start = format_datetime_to_local(start_datetime)
                 end = format_datetime_to_local(end_datetime)
                 is_all_day = False
@@ -108,7 +110,9 @@ def get_events():
                     "location": event.get("location", ""),
                     "isClosed": is_closed,
                     "isAllDay": is_all_day,
-                    "color": "#FF0000" if is_closed else "#00FF00",  # red for closed, green for opened
+                    "color": "#FF0000"
+                    if is_closed
+                    else "#00FF00",  # red for closed, green for opened
                 }
             )
 
@@ -139,7 +143,7 @@ def check_date_availability(date: str):
 
         # Fetch events for this day
         events_result = (
-            service.events()
+            service.events() # type ignore
             .list(
                 calendarId=NURBURGRING_CALENDAR_ID,
                 timeMin=start_date,
@@ -185,11 +189,9 @@ def check_date_availability(date: str):
                 end_datetime = event["end"].get("dateTime", "")
 
                 if start_datetime and end_datetime:
-                    # Parse and convert timezone
                     start_dt = parser.parse(start_datetime).astimezone(bulgaria_tz)
                     end_dt = parser.parse(end_datetime).astimezone(bulgaria_tz)
 
-                    # Format only hours and minutes
                     start_time = start_dt.strftime("%H:%M")
                     end_time = end_dt.strftime("%H:%M")
 
@@ -212,4 +214,35 @@ def check_date_availability(date: str):
         print(f"Error checking the date: {e}")
         raise HTTPException(
             status_code=500, detail=f"Error checking the date: {e}"
-        ) from e
+        ) from e #FIXME
+
+def _add_to_calendar(self, booking: Booking):
+    """Add the booking as an event in Google Calendar"""
+    try:
+        # Get car details
+        car = self.db.query(Car).filter(Car.id == booking.car_id).first()
+        car_name = f"{car.make} {car.model}" if car else "Unknown Car"
+
+        # Create event
+        event = {
+            "summary": f"Booking: {car_name} - {booking.full_name}",
+            "description": f"Laps: {booking.laps}\nPackage: {booking.package.value}\nContact: {booking.email}, {booking.phone_number}",
+            "start": {
+                "dateTime": booking.booking_time.isoformat(),
+                "timeZone": "Europe/Berlin",
+            },
+            "end": {
+                "dateTime": (
+                    booking.booking_time + datetime.timedelta(hours=2)
+                ).isoformat(),
+                "timeZone": "Europe/Berlin",
+            },
+            "colorId": "11",  # A distinct color for bookings
+        }
+        service.events().insert(
+            calendarId=NURBURGRING_CALENDAR_ID, body=event
+        ).execute()
+        return True
+    except Exception as e: #FIXME
+        logger.error("Failed to add booking to calendar: %s", e)
+        return False
